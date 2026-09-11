@@ -9,7 +9,6 @@ let morphFreq;
 let morphRange;
 
 function setup() {
-    const dim = Math.min(window.innerWidth, window.innerHeight);
     createCanvas(window.innerWidth, window.innerHeight);
 
     pixelDensity(2);
