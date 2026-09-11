@@ -10,7 +10,7 @@ let morphRange;
 
 function setup() {
     const dim = Math.min(window.innerWidth, window.innerHeight);
-    createCanvas(dim, dim);
+    createCanvas(window.innerWidth, window.innerHeight);
 
     pixelDensity(2);
 
