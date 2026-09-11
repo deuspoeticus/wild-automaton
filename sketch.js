@@ -17,7 +17,7 @@ function setup() {
     colorMode(HSB, 360, 100, 100);
 
     cols = floor(window.innerWidth / w);
-    rows = floor(window.innerHeight / h);
+    rows = floor(window.innerHeight / w);
 
     randomizeParams();
 
