@@ -3,6 +3,7 @@ let w = 4;
 let cols, rows;
 let ruleset = [];
 
+let seed;
 let hueOffset;
 let hueStep;
 let morphFreq;
@@ -18,6 +19,7 @@ function setup() {
     cols = floor(window.innerWidth / w);
     rows = floor(window.innerHeight / w);
 
+    newSeed(getSeedFromURL());
     randomizeParams();
 
     cells = new Array(cols).fill(0);
@@ -25,6 +27,37 @@ function setup() {
 
     generate();
     noLoop();
+}
+
+function sanitizeSeed(raw) {
+    if (raw === null || raw === undefined) return undefined;
+    const str = String(raw).trim();
+    if (!/^\d{1,15}$/.test(str)) return undefined;
+    const value = Number(str);
+    if (!Number.isSafeInteger(value)) return undefined;
+    return value;
+}
+
+function getSeedFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("seed");
+    if (raw === null) return undefined;
+    const value = sanitizeSeed(raw);
+    if (value === undefined) console.log("Ignoring invalid seed param:", raw);
+    return value;
+}
+
+function updateURLSeed(value) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("seed", String(value));
+    window.history.replaceState({}, "", url);
+}
+
+function newSeed(forcedSeed) {
+    seed = (forcedSeed !== undefined) ? forcedSeed : floor(random(1000000));
+    randomSeed(seed);
+    console.log("seed:", seed);
+    updateURLSeed(seed);
 }
 
 function randomizeParams() {
@@ -35,8 +68,8 @@ function randomizeParams() {
 }
 
 function calculateRuleset(ruleNum) {
-    const binary = ruleNum.toString(2).padStart(8, '0');
-    return binary.split('').reverse().map(x => parseInt(x));
+    const binary = ruleNum.toString(2).padStart(8, "0");
+    return binary.split("").reverse().map(x => parseInt(x));
 }
 
 function generate() {
@@ -98,12 +131,27 @@ function generate() {
 }
 
 function mousePressed() {
+    newSeed();
     randomizeParams();
     generate();
 }
 
 function keyTyped() {
-    if (key === 's' || key === 'S') {
-        saveCanvas('cellular-automata', 'png');
+    if (key === "s" || key === "S") {
+        saveCanvas("cellular-automata", "png");
+    }
+
+    if (key === "r" || key === "R") {
+        const input = window.prompt("Enter seed:");
+        if (input !== null && input.trim() !== "") {
+            const parsed = sanitizeSeed(input);
+            if (parsed !== undefined) {
+                newSeed(parsed);
+                randomizeParams();
+                generate();
+            } else {
+                console.log("Invalid seed:", input);
+            }
+        }
     }
 }
